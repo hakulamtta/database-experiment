@@ -1,0 +1,14 @@
+1.select * from student;
+2.Select Sname,Sage from Student where Dname='计算机';
+3.Select Cname,Chours from course;
+4.Select * from SC where Score>=80 and Score<=90;
+5.Select Sname from student where Sage=20 and Ssex='女' and Dname='计算机';
+6.select distinct Dname from Student;
+7.select Sname,Cid,Score from Student,SC where Student.Sid = SC.Sid and SC.Score > 85;
+8.select count(Sname) from Student where Sname like '王%';
+9.select max(Score) from Course,SC where Course.Cname = '数据库' and Course.Cid = SC.Cid;
+10.Select * From SC Order By Cid ASC,Score DESC;
+11.Select Sid,count(Cid) from SC group by Sid;
+12.select Sid from SC group by SC.Sid having avg(Score)<80;
+13.Select Sname From SC,Student Where Student.Sid = SC.Sid and Dname = '计算机'and Score >= all(Select Score From SC,Student where Student.Sid = SC.Sid and Dname  = '计算机');
+9.select Score from Course,SC where Course.Cname = '数据库' and Course.Cid = SC.Cid and SC.Score >= all(Select Score From Course,SC where Course.Cname = '数据库' and Course.Cid = SC.Cid);
