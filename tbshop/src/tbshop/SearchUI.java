@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 public class SearchUI {
 
@@ -17,6 +18,7 @@ public class SearchUI {
 	private static int comboValue = 0;
 	
 	private static JFrame frame;
+	private JTextField tfDelete;
 		
 	/**
 	 * Launch the application.
@@ -72,6 +74,19 @@ public class SearchUI {
         JTextArea ja = new JTextArea();
         ja.setBounds(20, 47, 493, 210);
         frame.getContentPane().add(ja);
+        
+        JLabel lb2 = new JLabel("输入待删除记录的ID：");
+        lb2.setBounds(20, 274, 200, 15);
+        frame.getContentPane().add(lb2);
+        
+        tfDelete = new JTextField();
+        tfDelete.setBounds(150, 271, 80, 21);
+        frame.getContentPane().add(tfDelete);
+        tfDelete.setColumns(10);
+        
+        JButton bDelete = new JButton("删除 ");
+        bDelete.setBounds(420, 274, 93, 23);
+        frame.getContentPane().add(bDelete);
 	
 	//下拉菜单监听事件
 		comboBox.addActionListener(new ActionListener() {	//监听事件
@@ -81,6 +96,19 @@ public class SearchUI {
 				System.out.println(comboValue);
 			}
 		});
+		
+		//删除按钮监听事件
+		bDelete.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		String id = tfDelete.getText();
+        		try {
+					ConnectSQL.delete(id,comboValue);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        	}
+        });
 		
 		//查找按钮监听事件
 		bSearch.addActionListener(new ActionListener() {

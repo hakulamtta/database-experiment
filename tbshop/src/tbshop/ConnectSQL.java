@@ -117,6 +117,40 @@ public class ConnectSQL {
 		return res;
 	}
 	
+	//删除函数
+	public static void delete(String id,int comboValue) throws SQLException
+	{
+		connectSql();//连接数据库
+		Statement stmt = connect.createStatement();
+		switch (comboValue)
+		{
+			case 1:
+				 stmt.executeUpdate("delete from shop where shopID='" + id + "';");
+				 stmt.executeUpdate("delete from orderList where shopID='" + id + "';");
+				 break;
+			case 2:
+				 stmt.executeUpdate("delete from worker where workID='" + id + "';");
+				 stmt.executeUpdate("delete from orderList where workID='" + id + "';");
+				 break;
+			case 3:
+				 stmt.executeUpdate("delete from guest where guestID='" + id + "';");
+				 stmt.executeUpdate("delete from orderList where guestID='" + id + "';");
+				 break;
+			case 4:
+				 stmt.executeUpdate("delete from good where goodID='" + id + "';");
+				 stmt.executeUpdate("delete from orderList where goodID='" + id + "';");
+				 break;
+			case 5:
+				 stmt.executeUpdate("delete from orderList where orderID='" + id + "';");
+				 stmt.executeUpdate("delete from detail where orderID='" + id + "';");
+				 break;
+			case 6:
+				 stmt.executeUpdate("delete from detail where detailID='" + id + "';");
+				 stmt.executeUpdate("delete from orderList where detailID='" + id + "';");
+				 break;
+		}
+	}
+	
 	//查询函数
 	public static String search() throws SQLException {
 		String res = "";
