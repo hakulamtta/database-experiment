@@ -45,31 +45,31 @@ public class ConnectSQL {
 			case 1:
 				str = "insert into shop values ('" + insertInfo.get(0) +
 						"','" + insertInfo.get(1) + "','" + insertInfo.get(2) + "');";
-				res = search("shop");
+				res = search("shop",1);
 				break;
 			case 2:
 				str = "insert into worker values ('" + insertInfo.get(0) +
 						"','" + insertInfo.get(1) + "','" + insertInfo.get(2) + "','" + insertInfo.get(3) + "'," + insertInfo.get(4) + ");";
-				res = search("worker");
+				res = search("worker",2);
 				break;
 			case 3:
 				str = "insert into guest values ('" + insertInfo.get(0) +
 						"','" + insertInfo.get(1) + "','" + insertInfo.get(2) + "');";
-				res = search("guest");
+				res = search("guest",3);
 				break;
 			case 4:
 				str = "insert into good values ('" + insertInfo.get(0) +
 						"','" + insertInfo.get(1) + "'," + insertInfo.get(2) + ",'" + insertInfo.get(3) + "'," + insertInfo.get(4) + ");";
-				res = search("good");
+				res = search("good",4);
 				break;
 			case 5:
 				str = "insert into worker values ('" + insertInfo.get(0) +
 						"','" + insertInfo.get(1) + "','" + insertInfo.get(2) + "','" + insertInfo.get(3) + "','" + insertInfo.get(4) + "',"+ insertInfo.get(5) + "');";
-				res = search("worker");
+				res = search("worker",5);
 			case 6:
 				str = "insert into good values ('" + insertInfo.get(0) +
 						"','" + insertInfo.get(1) + "','" + insertInfo.get(2) + "," + insertInfo.get(3) + ");";
-				res = search("good");
+				res = search("good",6);
 				break;
 		}
 		System.out.println(str);
@@ -77,15 +77,42 @@ public class ConnectSQL {
 		return res;
 	}
 	
-	public static String search(String str) throws SQLException
+	public static String search(String str,int comboValue) throws SQLException
 	{
 		String res = "";
 		ResultSet rs = null ;
+		connectSql();//连接数据库
 		Statement stmt = connect.createStatement();
 		rs = (ResultSet) stmt.executeQuery("select * from " + str + ";");
 		while (rs.next())
 		{
-			res = res + rs.getString("shopID") + " "+ rs.getString("shopAddr") + " " + rs.getString("shopTel") + "\n";
+			switch(comboValue)
+			{
+				case 1:
+//					res = "shopID\tshopAddr\t\tShopTel\n";
+					res = res + rs.getString("shopID") + "\t"+ rs.getString("shopAddr") + "\t" + rs.getString("shopTel") + "\n";
+					break;
+				case 2:
+//					res = "workID\tworkName\tposition\tworkTel\tsalary\n";
+					res = res + rs.getString("workID") + "\t"+ rs.getString("workName") + "\t" + rs.getString("position") + "\t" + rs.getString("workTel") + "\t" + rs.getString("salary")+ "\n";
+					break;
+				case 3:
+//					res = "guestID\tguestTel\tguestAddr\n";
+					res = res + rs.getString("guestID") + "\t"+ rs.getString("guestTel") + "\t" + rs.getString("guestAddr")+ "\n";
+					break;
+				case 4:
+//					res = "goodID\tgoodName\tprice\tpdDate\tamount\n";
+					res = res + rs.getString("goodID") + "\t"+ rs.getString("goodName") + "\t"+ rs.getString("price") + "\t" + rs.getString("pdDate") + rs.getString("amount")+ "\n";
+					break;
+				case 5:
+//					res = "orderID\tdetailID\tguestID\tworkID\tshopID\ttotalPrice\n";
+					res = res + rs.getString("orderID") + "\t"+ rs.getString("detailID") + "\t" + rs.getString("guestID")  + "\t" + rs.getString("workID") + "\t" + rs.getString("shopID") + "\t" + rs.getString("totalPrice") + "\n";
+					break;
+				case 6:
+//					res = "detailID\tgoodID\tquantity\tprice\n";
+					res = res + rs.getString("detailID") + "\t"+ rs.getString("goodID") + "\t" + rs.getString("quantity") + "\t" + rs.getString("price")  + "\n";
+					break;
+			}
 		}
 		return res;
 	}
