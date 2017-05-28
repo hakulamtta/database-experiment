@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -16,9 +17,12 @@ public class SearchUI {
 
 	private static String comboStr = "";
 	private static int comboValue = 0;
+	private static ArrayList<String> editInfo = new ArrayList<String>();
 	
 	private static JFrame frame;
 	private JTextField tfDelete;
+	private JTextField tfEdit;
+	private JTextField tfEditInfo;
 		
 	/**
 	 * Launch the application.
@@ -48,7 +52,7 @@ public class SearchUI {
 	 */
 	private void initialize() {
 		frame = new JFrame("查找编辑页面");
-		frame.setBounds(100, 100, 550, 480);
+		frame.setBounds(100, 100, 550, 440);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
@@ -87,6 +91,36 @@ public class SearchUI {
         JButton bDelete = new JButton("删除 ");
         bDelete.setBounds(420, 274, 93, 23);
         frame.getContentPane().add(bDelete);
+        
+        JLabel lblid = new JLabel("输入待编辑记录的ID：");
+        lblid.setBounds(20, 304, 150, 15);
+        frame.getContentPane().add(lblid);
+        
+        tfEdit = new JTextField();
+        tfEdit.setBounds(150, 300, 80, 21);
+        frame.getContentPane().add(tfEdit);
+        tfEdit.setColumns(10);
+        
+        JButton bEdit = new JButton("编辑");
+        bEdit.setBounds(420, 300, 93, 23);
+        frame.getContentPane().add(bEdit);
+        
+        JLabel lbl = new JLabel("输入待编辑记录的内容：");
+        lbl.setBounds(20, 329, 395, 15);
+        frame.getContentPane().add(lbl);
+        
+        tfEditInfo = new JTextField();
+        tfEditInfo.setBounds(20, 354, 493, 21);
+        frame.getContentPane().add(tfEditInfo);
+        tfEditInfo.setColumns(10);
+        
+        JButton bReturn = new JButton("返回");
+        bReturn.setBounds(420, 325, 93, 23);
+        frame.getContentPane().add(bReturn);
+        
+        JLabel lblfanfanwang = new JLabel("@FanfanWang");
+        lblfanfanwang.setBounds(431, 385, 93, 15);
+        frame.getContentPane().add(lblfanfanwang);
 	
 	//下拉菜单监听事件
 		comboBox.addActionListener(new ActionListener() {	//监听事件
@@ -110,6 +144,30 @@ public class SearchUI {
         	}
         });
 		
+		//编辑按钮监听事件
+		 bEdit.addActionListener(new ActionListener() {
+	        	public void actionPerformed(ActionEvent arg0) {
+	        		String info = tfEditInfo.getText();
+	        		editInfo = InsertUI.getInfo(info);
+	        		String id = tfEdit.getText();//待编辑的ID
+	        		try {
+						ConnectSQL.edit(editInfo, comboValue,id);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+	        	}
+	        });
+		
+		 //返回按钮监听事件
+		 bReturn.addActionListener(new ActionListener() {
+	        	public void actionPerformed(ActionEvent e) {
+	        		tfEdit.setText("");
+	        		tfEditInfo.setText("");
+	        		editInfo.clear();
+	        	}
+	        });
+		 
 		//查找按钮监听事件
 		bSearch.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {

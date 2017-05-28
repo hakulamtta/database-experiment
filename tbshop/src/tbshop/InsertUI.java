@@ -19,7 +19,7 @@ import javax.swing.JScrollPane;
 public class InsertUI {
 	private static String comboStr = "";
 	private static int comboValue = 0;
-	ArrayList<String> insertInfo = new ArrayList<String>();
+	static ArrayList<String> insertInfo = new ArrayList<String>();
 	private String  info = "";
 	private static JFrame frame;
 	private static JLabel jl1 = new JLabel("按序输入shopID,shopAddr,shopTel");
@@ -33,7 +33,7 @@ public class InsertUI {
 	private JTextArea ja = new JTextArea();//插入结果显示区域
 	
 	//获取要插入的信息，结果按序存在ArrayList
-	public ArrayList<String> getInfo(String info)
+	public static ArrayList<String> getInfo(String info)
 	{
 		
 		String tmp = "";
@@ -42,7 +42,7 @@ public class InsertUI {
 		int i = 0;
 		while(i < info.length())
 		{
-			if (info.charAt(i) != ' ' && info.charAt(i) != '#')
+			if (info.charAt(i) != ',' && info.charAt(i) != '，' && info.charAt(i) != '#')//中文英文的逗号均可以识别
 			{
 				tmp = tmp + info.charAt(i);
 				i++;
@@ -56,7 +56,7 @@ public class InsertUI {
 		}
 		insertInfo.add(tmp);
 		System.out.println("分割语句测试：");
-		for (i=0;i<3;i++)
+		for (i=0;i<insertInfo.size();i++)
 			System.out.println(insertInfo.get(i));
 		return insertInfo;
 	}
