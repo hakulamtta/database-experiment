@@ -123,34 +123,63 @@ public class ConnectSQL {
 	public static void delete(String id,int comboValue) throws SQLException
 	{
 		connectSql();//连接数据库
-		Statement stmt = connect.createStatement();
+		Statement stmt1 = connect.createStatement();
+		Statement stmt2 = connect.createStatement();
+		ResultSet rs = null ;
 		switch (comboValue)
 		{
 			case 1:
-				 stmt.executeUpdate("delete from shop where shopID='" + id + "';");
-				 stmt.executeUpdate("delete from orderList where shopID='" + id + "';");
+				//删除商店
+				 stmt1.executeUpdate("delete from shop where shopID='" + id + "';");
+				 //删除商店对应的订单明细
+				 rs = (ResultSet) stmt2.executeQuery("select detailID from orderList where shopID='" + id + "';");
+				 while(rs.next())
+					 stmt1.executeUpdate("delete from detail where detailID='" + rs.getString("detailID") + "';");
+				 //删除商店对应的订单
+				 stmt1.executeUpdate("delete from orderList where shopID='" + id + "';");
 				 break;
 			case 2:
-				 stmt.executeUpdate("delete from worker where workID='" + id + "';");
-				 stmt.executeUpdate("delete from orderList where workID='" + id + "';");
+				//删除员工
+				 stmt1.executeUpdate("delete from worker where workID='" + id + "';");
+				 //员工对应的订单列表不能删除
+//				 stmt1.executeUpdate("delete from orderList where workID='" + id + "';");
 				 break;
 			case 3:
-				 stmt.executeUpdate("delete from guest where guestID='" + id + "';");
-				 stmt.executeUpdate("delete from orderList where guestID='" + id + "';");
+				//删除顾客
+				 stmt1.executeUpdate("delete from guest where guestID='" + id + "';");
+				 //删除顾客对应的订单明细
+				 rs = (ResultSet) stmt2.executeQuery("select detailID from orderList where guestID='" + id + "';");
+				 while(rs.next())
+					 stmt1.executeUpdate("delete from detail where detailID='" + rs.getString("detailID") + "';");
+				 //删除顾客对应的订单
+				 stmt1.executeUpdate("delete from orderList where guestID='" + id + "';");
 				 break;
 			case 4:
-				 stmt.executeUpdate("delete from good where goodID='" + id + "';");
-				 stmt.executeUpdate("delete from orderList where goodID='" + id + "';");
+				//删除商品
+				 stmt1.executeUpdate("delete from good where goodID='" + id + "';");
+				 //删除商品对应的订单明细
+				 rs = (ResultSet) stmt2.executeQuery("select detailID from orderList where goodID='" + id + "';");
+				 while(rs.next())
+					 stmt1.executeUpdate("delete from detail where detailID='" + rs.getString("detailID") + "';");
+				 //商品对应的订单不能删除
+//				 stmt1.executeUpdate("delete from orderList where goodID='" + id + "';");
 				 break;
 			case 5:
-				 stmt.executeUpdate("delete from orderList where orderID='" + id + "';");
-				 stmt.executeUpdate("delete from detail where orderID='" + id + "';");
+				 //删除订单对应的明细
+				 rs = (ResultSet) stmt2.executeQuery("select detailID from orderList where orderID='" + id + "';");
+				 while(rs.next())
+					 stmt1.executeUpdate("delete from detail where detailID='" + rs.getString("detailID") + "';");
+				//删除订单
+				 stmt1.executeUpdate("delete from orderList where orderID='" + id + "';");
 				 break;
 			case 6:
-				 stmt.executeUpdate("delete from detail where detailID='" + id + "';");
-				 stmt.executeUpdate("delete from orderList where detailID='" + id + "';");
+				//删除订单明细
+				 stmt1.executeUpdate("delete from detail where detailID='" + id + "';");
+				 //从订单中删除明细项
+				 stmt1.executeUpdate("delete from orderList where detailID='" + id + "';");
 				 break;
 		}
+		update();
 	}
 	
 	//查询函数
@@ -175,12 +204,13 @@ public class ConnectSQL {
 	{		
 		connectSql();//连接数据库
 		Statement stmt = connect.createStatement();		
-		
 		String str = "";
 		str = dealEditCommand(editInfo,comboValue,id);
 		stmt.executeUpdate(str);
+		update();
 	}
 	
+	//辅助处理编辑操作的指令
 	private static String dealEditCommand(ArrayList<String> editInfo,int comboValue,String id)
 	{
 		String str = "update";
@@ -251,5 +281,34 @@ public class ConnectSQL {
 		}
 		System.out.println(str);
 		return str;
+	}
+	
+	//更新数据库内容，重新计算订单总价
+	private static void update() throws SQLException
+	{
+		connectSql();//连接数据库
+		ResultSet rs0 = null ;
+		ResultSet rs1 = null ;
+		Statement stmt0 = connect.createStatement();		//用于查询
+		Statement stmt1 = connect.createStatement();		//用于查询
+		Statement stmt2 = connect.createStatement();		//用于更新
+		rs1 = (ResultSet) stmt1.executeQuery("select goodID,price from good;");
+		while(rs1.next())//更新商品单价
+			stmt2.executeUpdate("update detail set price=" + rs1.getString("price") + "where goodID='" + rs1.getString("goodID") + "';");
+		
+		//计算订单总价-------------------------------------------------------------------------------------------每个订单总价一样
+		float sum  = 0;
+		rs0 = (ResultSet) stmt0.executeQuery("select detailID,orderID from orderList;");
+		while(rs0.next())//对每一个订单
+		{
+			sum = 0;
+			rs1 = (ResultSet) stmt1.executeQuery("select quantity,price from detail where detailID='" + rs0.getString("detailID") + "';");
+			while (rs1.next()){//对每个订单的明细
+				int quantity = rs1.getInt("quantity");
+				float price = rs1.getFloat("price");
+				sum += quantity * price;
+			}
+			stmt2.executeUpdate("update orderList set totalPrice=" + sum + "where orderID='" + rs0.getString("orderID") + "';");
+		}
 	}
 }
