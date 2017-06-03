@@ -42,6 +42,9 @@ public class ConnectSQL {
 		String res = "";
 		connectSql();//连接数据库
 		Statement stmt = connect.createStatement();
+		ResultSet rs = null ;
+		Statement stmt2 = connect.createStatement();
+		Boolean flag = false;
 		switch (comboValue)
 		{
 			case 1:
@@ -55,6 +58,7 @@ public class ConnectSQL {
 				res = search("worker",2);
 				break;
 			case 3:
+				
 				str = "insert into guest values ('" + insertInfo.get(0) +
 						"','" + insertInfo.get(1) + "','" + insertInfo.get(2) + "');";
 				res = search("guest",3);
@@ -65,53 +69,87 @@ public class ConnectSQL {
 				res = search("good",4);
 				break;
 			case 5:
-				str = "insert into worker values ('" + insertInfo.get(0) +
-						"','" + insertInfo.get(1) + "','" + insertInfo.get(2) + "','" + insertInfo.get(3) + "','" + insertInfo.get(4) + "',"+ insertInfo.get(5) + "');";
-				res = search("worker",5);
+				str = "insert into orderList values ('" + insertInfo.get(0) +
+						"','" + insertInfo.get(1) + "','" + insertInfo.get(2) + "','" + insertInfo.get(3) + "','" + insertInfo.get(4) + "',"+ insertInfo.get(5) + ");";
+				res = search("orderList",5);
 			case 6:
-				str = "insert into good values ('" + insertInfo.get(0) +
-						"','" + insertInfo.get(1) + "','" + insertInfo.get(2) + "," + insertInfo.get(3) + ");";
-				res = search("good",6);
+				rs = (ResultSet) stmt2.executeQuery("select goodID from good;");
+				
+				while(rs.next())
+				{
+					if ( insertInfo.get(1).equals(rs.getString("goodID")))
+					{
+						flag = true;
+					}
+				}
+				if (flag == true)
+				{
+					str = "insert into detail values ('" + insertInfo.get(0) +
+							"','" + insertInfo.get(1) + "','" + insertInfo.get(2) + "," + insertInfo.get(3) + ");";
+					res = search("good",6);
+				}
+				else
+					System.out.println("商品不存在！");
 				break;
 		}
-		System.out.println(str);
-		stmt.executeUpdate(str);
+		if (flag == true){
+			System.out.println(str);
+			stmt.executeUpdate(str);
+		}
+		flag = false;
+		update();
 		return res;
 	}
 	
+	//查找函数
 	public static String search(String str,int comboValue) throws SQLException
 	{
 		String res = "";
 		ResultSet rs = null ;
 		connectSql();//连接数据库
 		Statement stmt = connect.createStatement();
+		switch(comboValue)
+		{
+			case 1:
+				res = "shopID\tshopAddr\t\tShopTel\n";
+				break;
+			case 2:
+				res = "workID\tworkName\tposition\tworkTel\tsalary\n";
+				break;
+			case 3:
+				res = "guestID\tguestTel\tguestAddr\n";
+				break;
+			case 4:
+				res = "goodID\tgoodName\tprice\tpdDate\tamount\n";
+				break;
+			case 5:
+				res = "orderID\tdetailID\tguestID\tworkID\tshopID\ttotalPrice\n";
+				break;
+			case 6:
+				res = "detailID\tgoodID\tquantity\tprice\n";
+				break;
+		}
 		rs = (ResultSet) stmt.executeQuery("select * from " + str + ";");
-		while (rs.next())
+		while (rs.next())//组织输出结果
 		{
 			switch(comboValue)
 			{
 				case 1:
-//					res = "shopID\tshopAddr\t\tShopTel\n";
 					res = res + rs.getString("shopID") + "\t"+ rs.getString("shopAddr") + "\t" + rs.getString("shopTel") + "\n";
 					break;
 				case 2:
-//					res = "workID\tworkName\tposition\tworkTel\tsalary\n";
 					res = res + rs.getString("workID") + "\t"+ rs.getString("workName") + "\t" + rs.getString("position") + "\t" + rs.getString("workTel") + "\t" + rs.getString("salary")+ "\n";
 					break;
 				case 3:
-//					res = "guestID\tguestTel\tguestAddr\n";
 					res = res + rs.getString("guestID") + "\t"+ rs.getString("guestTel") + "\t" + rs.getString("guestAddr")+ "\n";
 					break;
 				case 4:
-//					res = "goodID\tgoodName\tprice\tpdDate\tamount\n";
-					res = res + rs.getString("goodID") + "\t"+ rs.getString("goodName") + "\t"+ rs.getString("price") + "\t" + rs.getString("pdDate") + rs.getString("amount")+ "\n";
+					res = res + rs.getString("goodID") + "\t"+ rs.getString("goodName") + "\t"+ rs.getString("price") + "\t" + rs.getString("pdDate") + "\t" + rs.getString("amount")+ "\n";
 					break;
 				case 5:
-//					res = "orderID\tdetailID\tguestID\tworkID\tshopID\ttotalPrice\n";
 					res = res + rs.getString("orderID") + "\t"+ rs.getString("detailID") + "\t" + rs.getString("guestID")  + "\t" + rs.getString("workID") + "\t" + rs.getString("shopID") + "\t" + rs.getString("totalPrice") + "\n";
 					break;
 				case 6:
-//					res = "detailID\tgoodID\tquantity\tprice\n";
 					res = res + rs.getString("detailID") + "\t"+ rs.getString("goodID") + "\t" + rs.getString("quantity") + "\t" + rs.getString("price")  + "\n";
 					break;
 			}
@@ -271,19 +309,19 @@ public class ConnectSQL {
 			str += " where orderID='" + id + "';";
 			break;
 		case 6:
-			str += " detail set ";
-			if (!editInfo.get(0).equals(" "))
-				str = str + " goodID='" + editInfo.get(0) + "'";
-			if (!editInfo.get(1).equals(" "))
-				str = str + ",quantity='" + editInfo.get(1) + "'";
-			str = str + " where detailID = '" + id + "';";
+			String id1,id2;
+			System.out.println(id);
+			id1  = id.substring(0, 9);//detailID
+			id2 = id.substring(10);//goodID
+			str += " detail set quantity='" + editInfo.get(0) + "'";
+			str = str + " where detailID = '" + id1 + "' and goodID='" + id2 + "';";
 			break;
 		}
 		System.out.println(str);
 		return str;
 	}
 	
-	//更新数据库内容，重新计算订单总价
+	//更新数据库内容，重新计算订单总价,更新商品单价
 	private static void update() throws SQLException
 	{
 		connectSql();//连接数据库

@@ -164,6 +164,7 @@ public class SearchUI {
 	        	public void actionPerformed(ActionEvent e) {
 	        		tfEdit.setText("");
 	        		tfEditInfo.setText("");
+	        		tfDelete.setText("");
 	        		editInfo.clear();
 	        	}
 	        });
